@@ -567,18 +567,22 @@ Product ID | Name           | Price   | Rating | Delivery | Reviews
 ### 17.2 Expected Top-1 Product for K=1
 
 **Weighted (w_price=0.25, w_rating=0.40, w_delivery=0.15, w_reviews=0.20)**
+
 - Result: Smartphone E (score ≈ 0.82)
 - Reasoning: High rating, low price, fast delivery, high reviews
 
 **Lexicographic (priority: rating desc → price asc → delivery asc)**
+
 - Result: Smartphone E (4.7 rating)
 - Reasoning: Highest rating; among tied ratings, lowest price wins
 
 **Pareto (multi-objective non-dominated)**
+
 - Result: Smartphone E or F (both on Front-1)
 - Reasoning: Both are non-dominated; Pareto returns Front-1
 
 **Hybrid (Pareto + weighted within front)**
+
 - Result: Smartphone E
 - Reasoning: Front-1 has {E, F, B}; E has highest weighted score
 
@@ -602,6 +606,7 @@ For K=1 on 6-product sample:
 | Hybrid | 85 | 100% | 0.18 | Practical balance |
 
 For larger datasets (100K products):
+
 - Weighted: ~120 ms
 - Lexicographic: ~95 ms
 - Pareto: ~800 ms (without approximation)

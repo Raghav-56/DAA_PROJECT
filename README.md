@@ -4,7 +4,8 @@
 
 This project implements an extensible product ranking system for e-commerce platforms that intelligently ranks products based on multiple attributes and retrieves the top-K products efficiently from large datasets.
 
-Think of it as a smart shopping assistant that shows you the best products based on what matters most to yo:price, ratings, delivery time, discounts, or a combination of all of these.
+Think of it as a smart shopping assistant that shows you the best products based on what matters most to you:  
+price, ratings, delivery time, discounts, or a combination of all of these.
 
 ## Key Features
 
@@ -56,7 +57,7 @@ Here's how different strategies rank the same 6 smartphones:
 
 ### Original Catalog
 
-```
+``` txt
 Product            | Price   | Rating | Delivery | Reviews
 ─────────────────────────────────────────────────────────────
 Smartphone A       | ₹14,999 | 4.2    | 2 days   | 850
@@ -69,7 +70,7 @@ Smartphone F       | ₹19,999 | 4.6    | 5 days   | 760
 
 ### Strategy 1: Weighted Scoring (Price 30%, Rating 40%, Reviews 20%, Delivery 10%)
 
-```
+``` txt
 1. Smartphone E    ✓ High rating, good price, fast delivery, popular
 2. Smartphone B    ✓ Good rating, competitive price
 3. Smartphone A    ✓ Good rating and reviews, moderate price
@@ -80,7 +81,7 @@ Smartphone F       | ₹19,999 | 4.6    | 5 days   | 760
 
 ### Strategy 2: Lexicographic (Sort by: Rating → Price → Delivery)
 
-```
+``` txt
 1. Smartphone E    (4.7 rating, cheapest among top-rated)
 2. Smartphone F    (4.6 rating, but expensive)
 3. Smartphone B    (4.5 rating, good price)
@@ -91,7 +92,7 @@ Smartphone F       | ₹19,999 | 4.6    | 5 days   | 760
 
 ### Strategy 3: Pareto-Optimal (Multi-objective balance)
 
-```
+``` txt
 Front-1 (Non-dominated):
   - Smartphone E (best rating + good price + fast)
   - Smartphone B (fast + high popularity)
@@ -107,7 +108,7 @@ Front-3:
 
 ### Strategy 4: Hybrid (Pareto fronts + weighted score within each)
 
-```
+``` txt
 Front-1 ordered by weighted score:
 1. Smartphone E
 2. Smartphone F
@@ -131,7 +132,3 @@ case_study/
 ├── README.md        # This file
 └── (implementation files will go here)
 ```
-
-## Next Steps
-
-Implement ranking engines and evaluation harness based on the detailed specification in `project.md`.
