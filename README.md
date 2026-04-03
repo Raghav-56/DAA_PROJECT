@@ -50,7 +50,78 @@ Think of it as a smart shopping assistant that shows you the best products based
 | Medium Dataset (100K) | ~120-800 ms (strategy dependent) |
 | Large Dataset (1M) | Optimized for practical runtimes |
 
-See [project.md](project.md) for the complete technical specification.
+## Example: Ranking Smartphones
+
+Here's how different strategies rank the same 6 smartphones:
+
+### Original Catalog
+
+```
+Product            | Price   | Rating | Delivery | Reviews
+─────────────────────────────────────────────────────────────
+Smartphone A       | ₹14,999 | 4.2    | 2 days   | 850
+Smartphone B       | ₹11,999 | 4.5    | 4 days   | 910
+Smartphone C       | ₹14,999 | 4.0    | 3 days   | 620
+Smartphone D       | ₹8,999  | 4.1    | 1 day    | 700
+Smartphone E       | ₹11,999 | 4.7    | 2 days   | 980  ← Best overall
+Smartphone F       | ₹19,999 | 4.6    | 5 days   | 760
+```
+
+### Strategy 1: Weighted Scoring (Price 30%, Rating 40%, Reviews 20%, Delivery 10%)
+
+```
+1. Smartphone E    ✓ High rating, good price, fast delivery, popular
+2. Smartphone B    ✓ Good rating, competitive price
+3. Smartphone A    ✓ Good rating and reviews, moderate price
+4. Smartphone F    ~ Excellent rating, but expensive & slow
+5. Smartphone D    ~ Cheapest, but lower rating
+6. Smartphone C    ✗ Lowest rating
+```
+
+### Strategy 2: Lexicographic (Sort by: Rating → Price → Delivery)
+
+```
+1. Smartphone E    (4.7 rating, cheapest among top-rated)
+2. Smartphone F    (4.6 rating, but expensive)
+3. Smartphone B    (4.5 rating, good price)
+4. Smartphone A    (4.2 rating)
+5. Smartphone D    (4.1 rating, cheapest overall)
+6. Smartphone C    (4.0 rating, slowest)
+```
+
+### Strategy 3: Pareto-Optimal (Multi-objective balance)
+
+```
+Front-1 (Non-dominated):
+  - Smartphone E (best rating + good price + fast)
+  - Smartphone B (fast + high popularity)
+  - Smartphone F (highest rating)
+
+Front-2:
+  - Smartphone A (ratings, delivery, reviews)
+  - Smartphone D (lowest price)
+
+Front-3:
+  - Smartphone C (dominated by all)
+```
+
+### Strategy 4: Hybrid (Pareto fronts + weighted score within each)
+
+```
+Front-1 ordered by weighted score:
+1. Smartphone E
+2. Smartphone F
+3. Smartphone B
+
+Front-2 ordered by weighted score:
+4. Smartphone A
+5. Smartphone D
+
+Front-3:
+6. Smartphone C
+```
+
+See [project.md](project.md) for the complete technical specification and detailed evaluation metrics.
 
 ## Project Structure
 
