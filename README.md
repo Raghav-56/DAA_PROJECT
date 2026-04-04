@@ -24,9 +24,24 @@ price, ratings, delivery time, discounts, or a combination of all of these.
 
 ## The Data
 
-- **Scale**: 100,000 to 1,000,000 products
-- **Attributes**: Rating, price, discount, delivery time, review count, category
-- **Type**: Static batch dataset (offline analysis)
+This project uses the **Amazon Products Sales 42K (2025)** dataset, a curated collection of real e-commerce products with comprehensive historical sales and review information.
+
+### Dataset Overview
+
+- **Source**: Amazon product catalog (Kaggle, CC BY-NC 4.0 licensed)
+- **Scale**: 42,000+ products  
+  - Ideal for learning and benchmarking all ranking strategies  
+  - Can be augmented to 100K+ with controlled resampling for scalability studies
+- **Attributes**: 
+  - **Required**: Price, rating (0–5 stars)
+  - **Optional**: Discount percentage, review count, category, delivery estimates
+- **Type**: Static batch dataset (offline analysis), snapshots of products across all categories
+
+### Data Quality
+
+- **Coverage**: Multiple product categories (Electronics, Books, Home & Kitchen, etc.)
+- **Preprocessing**: Single-table structure minimizes data wrangling complexity
+- **Interpretability**: Real e-commerce prices and ratings, results are immediately applicable
 
 ## What It Does
 
