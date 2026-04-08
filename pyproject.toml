@@ -1,7 +1,31 @@
 [project]
 name = "case-study"
 version = "0.1.0"
-description = "Add your description here"
+description = "E-commerce top-k ranking API and benchmark suite"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+	"fastapi>=0.122.0",
+	"uvicorn>=0.35.0",
+	"pandas>=2.3.0",
+	"numpy>=2.3.0",
+	"matplotlib>=3.10.0",
+	"seaborn>=0.13.2",
+	"psutil>=7.0.0",
+]
+
+[project.scripts]
+case-study = "Src.main:run_cli"
+
+[dependency-groups]
+dev = [
+	"pytest>=8.4.0",
+	"mypy>=1.16.0",
+	"httpx>=0.28.0",
+]
+
+[tool.pytest.ini_options]
+markers = [
+	"smoke: fast smoke tests",
+	"slow: full matrix tests",
+]

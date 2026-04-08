@@ -95,3 +95,72 @@ For the extended design plan, refer to `Extended/README_extended.md` and `Extend
 - **[dataset.md](dataset.md)**: Dataset research, candidate evaluation, schema mapping, preprocessing validation, ETL considerations
 - **[links.md](links.md)**: Dataset URLs and repository links
 - **[Extended/](Extended/)**: Advanced features roadmap and archived original specification (Pareto ranking, multi-strategy frameworks, extended reproducibility)
+
+## Setup and Reproducibility
+
+All commands are `uv`-based for deterministic environments.
+
+```bash
+uv sync
+```
+
+This installs runtime and dev dependencies from `pyproject.toml` and creates `uv.lock`.
+
+Optional dependency operations:
+
+```bash
+uv add <package>
+uv add --dev <package>
+```
+
+## Run API Server
+
+```bash
+uv run uvicorn Src.api.app:app --host 0.0.0.0 --port 5000
+```
+
+Health check:
+
+```bash
+uv run curl http://localhost:5000/health
+```
+
+## Run Benchmarks
+
+Smoke benchmark (fast subset):
+
+```bash
+uv run python Src/main.py benchmark --smoke
+```
+
+Full benchmark matrix:
+
+```bash
+uv run python Src/main.py benchmark --full
+```
+
+## Run Tests
+
+Smoke tests:
+
+```bash
+uv run pytest -m smoke -v
+```
+
+Full suite:
+
+```bash
+uv run pytest -v
+```
+
+## Output Artifacts
+
+Default output directories:
+
+- `outputs/benchmarks/benchmark_results.csv`
+- `outputs/rankings/*.json`
+- `outputs/reports/benchmark_report.md`
+- `outputs/reports/runtime_scaling.png`
+- `outputs/reports/algorithm_comparison.png`
+- `outputs/reports/speedup_analysis.png`
+- `outputs/reports/validation_*.md`

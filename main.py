@@ -1,6 +1,5 @@
-def main():
-    print("Hello from case-study!")
+from Src.main import run_cli
 
 
 if __name__ == "__main__":
-    main()
+    run_cli()
