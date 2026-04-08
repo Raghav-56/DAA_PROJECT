@@ -1,149 +1,97 @@
-# Multi-Strategy E-Commerce Product Ranking System
+# E-Commerce Top-K Product Ranking: Proof of Concept
 
 ## Overview
 
-This project implements an extensible product ranking system for e-commerce platforms that intelligently ranks products based on multiple attributes and retrieves the top-K products efficiently from large datasets.
+This project implements a minimal proof-of-concept for efficient product ranking using three sorting algorithms (Merge Sort, Quick Sort, Heap Top-K) on 42,000 real e-commerce products. It delivers two components: a production-ready ranking API server with caching, and a comprehensive benchmarking analysis of algorithm performance.
 
-Think of it as a smart shopping assistant that shows you the best products based on what matters most to you:  
-price, ratings, delivery time, discounts, or a combination of all of these.
+## Objectives
 
-## Key Features
+1. **Ranking Server Software** (Component A): Production-ready HTTP API accepting ranking requests and returning sorted product IDs with optional caching.
+2. **Benchmarking & Performance Analysis** (Component B): Benchmark suite measuring runtime, complexity, and scalability across all algorithm-strategy combinations.
 
-### 4 Ranking Strategies
+---
 
-1. **Weighted Scoring**: Combines multiple product attributes with customizable weights. Fast and balanced.
-2. **Lexicographic Sorting**: Ranks by strict priority order (e.g., "highest rating first, then lowest price"). Quick and interpretable.
-3. **Pareto-Optimal Ranking**: Multi-objective approach that avoids trade-offs. Best quality, slower execution.
-4. **Hybrid Strategy**: Combines Pareto fronts with weighted scoring for practical quality-runtime balance.
+## Core Deliverables
 
-### Smart Customization
+### Component A: Ranking Server Software
 
-- **User Profile Modes**: Different weight presets for new customers, returning customers, and premium members.
-- **Explainable Results**: Each ranked product includes a breakdown of why it was selected.
-- **Benchmark & Compare**: Measure performance and result quality across all strategies.
+**HTTP API** (`POST /rank`) accepting ranking requests with strategy, algorithm, and k parameters. Returns sorted product IDs with execution metrics. Implements LRU caching with configurable TTL.
 
-## The Data
+**Implementation stack**: FastAPI + Uvicorn.
 
-This project uses the **Amazon Products Sales 42K (2025)** dataset, a curated collection of real e-commerce products with comprehensive historical sales and review information.
+**Supported ranking strategies**: Single-Attribute Ascending/Descending, Lexicographic, Weighted Composite Score.  
+**Algorithms**: Merge Sort (O(n log n)), Quick Sort (O(n log n) avg), Heap Top-K (O(n log k)).  
+**Features**: Thread-safe concurrent request handling, automatic algorithm selection, strict inactive-attribute validation with opt-in fallback, comprehensive error handling.
 
-### Dataset Overview
+**Details**: See [project.md § 4](project.md#4-server-architecture--requestresponse-protocol): API specification, request/response formats, caching mechanism, configuration, error codes.
 
-- **Source**: Amazon product catalog (Kaggle, CC BY-NC 4.0 licensed)
-- **Scale**: 42,000+ products  
-  - Ideal for learning and benchmarking all ranking strategies  
-  - Can be augmented to 100K+ with controlled resampling for scalability studies
-- **Attributes**: 
-  - **Required**: Price, rating (0–5 stars)
-  - **Optional**: Discount percentage, review count, category, delivery estimates
-- **Type**: Static batch dataset (offline analysis), snapshots of products across all categories
+### Component B: Benchmarking & Performance Analysis
 
-### Data Quality
+**Executes** 12 algorithm-strategy combinations across 4 dataset sizes {1K, 5K, 10K, 42K} with varying k values {10, 100, 500}.
 
-- **Coverage**: Multiple product categories (Electronics, Books, Home & Kitchen, etc.)
-- **Preprocessing**: Single-table structure minimizes data wrangling complexity
-- **Interpretability**: Real e-commerce prices and ratings, results are immediately applicable
+**Protocol**: Cache disabled for benchmark warmup and measured runs; 2 warmups + 5 measured iterations per point; report mean and median for ranking-only and end-to-end timing scopes.
 
-## What It Does
+**Deliverables**: Raw benchmark CSVs, algorithm comparison summary, performance graphs (runtime scaling, complexity verification, speedup analysis), markdown report with findings and hardware specifications.
 
-1. **Preprocess**: Clean and prepare product data
-2. **Rank**: Apply one of four strategies to order products
-3. **Retrieve Top-K**: Get the best N products efficiently
-4. **Explain**: Show why each product ranked where it did
-5. **Evaluate**: Compare strategies on speed, quality, and overlap
+**Details**: See [project.md § 9](project.md#9-benchmark-design-and-validation-protocol): Methodology, validation criteria, performance profiles, output formats.
 
-## Design Highlights
+---
 
-- Modular architecture: Easy to add new ranking strategies
-- Scalable: Handles large datasets with practical runtimes
-- Deterministic: Same input always produces same output
-- Reproducible: Full audit trail with dataset/config hashes
+## Scope: What Is Included
 
-## Quick Stats
+- Python server implementation with `/rank` HTTP API
+- Merge Sort, Quick Sort, Heap Top-K algorithms with deterministic comparators
+- Four ranking strategies: Single-Attribute (Asc/Desc), Lexicographic, Weighted Composite
+- LRU caching with configurable TTL and automatic invalidation
+- Thread-safe concurrent request handling with strict-by-default fallback controls (`allow_fallback`)
+- Comprehensive benchmark suite: 12 algorithm-strategy combinations × 4 dataset sizes × 3 k-values = 144+ runs
+- Performance metrics: runtime, complexity verification, memory usage, speedup analysis
+- Outputs: Raw/summary CSVs, performance graphs, markdown report with hardware details
+- Reproducibility baseline: uv-managed Python 3.12 environment with pinned dependencies and committed `uv.lock`
 
-| Metric | Performance |
-| --- | --- |
-| Small Dataset (10K) | ~50-100 ms |
-| Medium Dataset (100K) | ~120-800 ms (strategy dependent) |
-| Large Dataset (1M) | Optimized for practical runtimes |
+**Details**: See [project.md § 2–3](project.md#2-algorithms-specification-and-rationale) for algorithms and ranking strategies; [§ 4](project.md#4-server-architecture--requestresponse-protocol) for server details; [§ 9–11](project.md#9-benchmark-design-and-validation-protocol) for benchmarking and execution.
 
-## Example: Ranking Smartphones
+## Scope: What Is Out of Scope
 
-Here's how different strategies rank the same 6 smartphones:
+The following advanced topics are intentionally deferred to the Extended roadmap:
 
-### Original Catalog
+- Pareto-optimal ranking (multi-objective skyline computation)
+- Hybrid strategies combining Pareto fronts with weighted scoring
+- User-profile-based weight presets and customization
+- Explainability and per-product rank justification
+- Complex configuration validation and edge-case handling
+- Multi-table ETL pipelines or advanced data wrangling
 
-``` txt
-Product            | Price   | Rating | Delivery | Reviews
-─────────────────────────────────────────────────────────────
-Smartphone A       | ₹14,999 | 4.2    | 2 days   | 850
-Smartphone B       | ₹11,999 | 4.5    | 4 days   | 910
-Smartphone C       | ₹14,999 | 4.0    | 3 days   | 620
-Smartphone D       | ₹8,999  | 4.1    | 1 day    | 700
-Smartphone E       | ₹11,999 | 4.7    | 2 days   | 980  ← Best overall
-Smartphone F       | ₹19,999 | 4.6    | 5 days   | 760
-```
+For the extended design plan, refer to `Extended/README_extended.md` and `Extended/project_extended.md`.
 
-### Strategy 1: Weighted Scoring (Price 30%, Rating 40%, Reviews 20%, Delivery 10%)
+## Dataset
 
-``` txt
-1. Smartphone E    ✓ High rating, good price, fast delivery, popular
-2. Smartphone B    ✓ Good rating, competitive price
-3. Smartphone A    ✓ Good rating and reviews, moderate price
-4. Smartphone F    ~ Excellent rating, but expensive & slow
-5. Smartphone D    ~ Cheapest, but lower rating
-6. Smartphone C    ✗ Lowest rating
-```
+**Amazon Products Sales 42K (2025)**  
+**Source**: [Kaggle](https://www.kaggle.com/datasets/ikramshah512/amazon-products-sales-dataset-42k-items-2025)  
+**License**: CC BY-NC 4.0 (academic research use; non-commercial)  
+**Scale**: 42,000+ products in single CSV table  
+**Core attributes**: price (cost), rating (benefit)  
+**Optional attributes**: discount, reviews_count, delivery_time, category
 
-### Strategy 2: Lexicographic (Sort by: Rating → Price → Delivery)
+**Feature activation**: Core attributes always active. Optional attributes active iff present in dataset AND >95% parsing success AND statistically significant (variance > 1e-12).
 
-``` txt
-1. Smartphone E    (4.7 rating, cheapest among top-rated)
-2. Smartphone F    (4.6 rating, but expensive)
-3. Smartphone B    (4.5 rating, good price)
-4. Smartphone A    (4.2 rating)
-5. Smartphone D    (4.1 rating, cheapest overall)
-6. Smartphone C    (4.0 rating, slowest)
-```
+**Data quality**: Missing values <30% per attribute; price and rating mandatory; median imputation for missing numeric values.
 
-### Strategy 3: Pareto-Optimal (Multi-objective balance)
+**Details**, candidate evaluation, and schema mapping: See [dataset.md](dataset.md)
 
-``` txt
-Front-1 (Non-dominated):
-  - Smartphone E (best rating + good price + fast)
-  - Smartphone B (fast + high popularity)
-  - Smartphone F (highest rating)
+## Ranking & Algorithms
 
-Front-2:
-  - Smartphone A (ratings, delivery, reviews)
-  - Smartphone D (lowest price)
+**Deterministic total order** enforced across all three algorithms:
 
-Front-3:
-  - Smartphone C (dominated by all)
-```
+- Primary: Composite score (descending) or single attribute (ascending/descending) per strategy
+- Tie-breaks are strategy-specific (see project spec), with deterministic final fallback on product_id (asc) then row_uid (asc)
+- Floating-point tolerance: scores equal iff |a - b| ≤ 1e-9
 
-### Strategy 4: Hybrid (Pareto fronts + weighted score within each)
+**Algorithm specifications, preprocessing formulas, scoring computations**: See [project.md § 2, 6–7](project.md#2-algorithms-specification-and-rationale)
 
-``` txt
-Front-1 ordered by weighted score:
-1. Smartphone E
-2. Smartphone F
-3. Smartphone B
+## References
 
-Front-2 ordered by weighted score:
-4. Smartphone A
-5. Smartphone D
-
-Front-3:
-6. Smartphone C
-```
-
-See [project.md](project.md) for the complete technical specification and detailed evaluation metrics.
-
-## Project Structure
-
-``` txt
-case_study/
-├── project.md       # Full technical specification
-├── README.md        # This file
-└── (implementation files will go here)
-```
+- **[project.md](project.md)**: Technical specification: algorithms, ranking strategies, server API, benchmarking protocol, preprocessing formulas, deterministic comparators, execution/invocation details
+- **[dataset.md](dataset.md)**: Dataset research, candidate evaluation, schema mapping, preprocessing validation, ETL considerations
+- **[links.md](links.md)**: Dataset URLs and repository links
+- **[Extended/](Extended/)**: Advanced features roadmap and archived original specification (Pareto ranking, multi-strategy frameworks, extended reproducibility)

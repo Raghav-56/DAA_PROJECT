@@ -1,6 +1,6 @@
 # Dataset Research & Selection Process
 
-## Research Scope & Questions
+## 1. Research Scope & Questions
 
 E-commerce product datasets suitable for benchmarking Top-K ranking algorithms.  
 
@@ -10,7 +10,7 @@ E-commerce product datasets suitable for benchmarking Top-K ranking algorithms.
 4. Evaluate preprocessing complexity: prefer single-table datasets to minimize ETL overhead
 5. Confirm licensing and data quality to avoid mid-project blockers
 
-## Core Project Schema Requirements
+## 2. Core Project Schema Requirements
 
 The ranking system expects product-level records:
 
@@ -33,7 +33,7 @@ Product = {
 - Review/rating aggregation may require product-level deduplication
 - Scale target (10^5–10^6) conflicts with single-table availability (<100K products rare)
 
-## Candidate Datasets Identified & Evaluated
+## 3. Candidate Datasets Identified & Evaluated
 
 ### Tier 1: Single-table, strong schema fit
 
@@ -73,9 +73,7 @@ Product = {
 
 **Critical finding:** Large-scale datasets lack delivery_time and discount entirely. Not suitable unless project scope changes.
 
-## Candidate Datasets
-
-## Practical options
+### 3a. Quick Reference: Practical Options (Tier 1 Candidates)
 
 | Dataset | Link | Scale | Structure | Coverage vs required schema | Main caveats |
 |---|---|---:|---|---|---|
@@ -84,7 +82,7 @@ Product = {
 | Amazon E-commerce Products and Reviews Dataset | <https://www.kaggle.com/datasets/lazylad99/amazon-e-commerce-product-and-review-dataset> | 2 CSV files (57 columns total) | Product + review tables | Product table includes price_value, list_price, rating_stars, rating_count, delivery_date, fastest_delivery_date, category trail | Domain is clothing/accessories; row scale is moderate |
 | Flipkart Products (PromptCloudHQ) | <https://www.kaggle.com/datasets/PromptCloudHQ/flipkart-products> | 20,000 products | Single table | retail_price, discounted_price, product_rating, overall_rating, product_category_tree | No direct reviews_count; no delivery-time signal |
 
-## Schema Fit Analysis
+## 4. Schema Fit Analysis
 
 | Dataset | price | rating | reviews_count | discount | delivery_time | category | Effort to Production | Issues |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -98,19 +96,19 @@ Legend: ✓ = direct; ◐ = derivable (requires processing); ✗ = missing; ? = 
 \* Derivable from delivery_date, but semantics must be verified post-download  
 \** Requires product-level aggregation from order tables via SQL group-by
 
-## 6. Licensing & Data Quality Implications
+## 5. Licensing & Data Quality Implications
 
-**Amazon 42K (2025):** CC BY-NC 4.0 — allows research use, prohibits commercial applications. Verifiable on Kaggle.
+**Amazon 42K (2025):** CC BY-NC 4.0, allows research use and prohibits commercial applications. Verifiable on Kaggle.
 
-**Olist:** CC BY-NC-SA 4.0 — non-commercial, share-alike. Multi-table; confirmed availability (2M views in last 30 days).
+**Olist:** CC BY-NC-SA 4.0, non-commercial and share-alike. Multi-table; confirmed availability (2M views in last 30 days).
 
-**Cleaned Amazon:** Apache 2.0 — most permissive; single file reduces dependency risk.
+**Cleaned Amazon:** Apache 2.0, most permissive; single file reduces dependency risk.
 
-**DataCo:** CC0/CC BY 4.0 but licensing is ambiguous on official page — recommend clarification.
+**DataCo:** CC0/CC BY 4.0, but licensing is ambiguous on official page; recommend clarification.
 
 **Problem identified:** All Kaggle datasets prohibit commercial publication of benchmarks. Acceptable for course deliverables, but blocks external publishing of results.
 
-## 7. Known Issues & Validation Checklist
+## 6. Known Issues & Validation Checklist
 
 Before committing implementation time, must:
 
@@ -122,7 +120,7 @@ Before committing implementation time, must:
 
 2. **Product-level aggregation (Olist only):**
    - Test join logic: orders → order_items → products
-   - Handle NULL delivery_customer_date (cancelled/returned orders — filter out?)
+   - Handle NULL delivery_customer_date (cancelled/returned orders; filter out?)
    - Decide: mean, median, or p50 for price/rating aggregation?
    - Risk: duplicate product_ids in multi-seller marketplace
 
@@ -173,7 +171,7 @@ delivery_time         → DERIVED (see section 9)
 4. Run preprocessing pipeline
 5. Verify output schema against Product type
 
-## 9. Secondary Recommendation: Olist (Optional Extension)
+## 8. Secondary Recommendation: Olist (Optional Extension)
 
 **Status:** SECONDARY; conditional on time availability
 
@@ -201,7 +199,7 @@ discount              → NOT AVAILABLE (flag in config: SKIP_DISCOUNT=true)
 - Join risk: Multi-seller products aggregate all variants together OR filter to primary seller
 - Imputation: For missing delivery dates, use category median or drop rows (document choice)
 
-## 10. Large-Scale Experiments (Defer to v2+)
+## 9. Large-Scale Experiments (Defer to v2+)
 
 **Status:** NOT RECOMMENDED FOR V1
 
@@ -217,7 +215,7 @@ If you must test >1M scale:
 - Still missing discount/delivery_time; **label as "scale-only experiment"**
 - **Defer to post-V1** if timeline permits
 
-## 11. Production Validation Checklist
+## 10. Production Validation Checklist
 
 Before running benchmarks:
 
@@ -231,7 +229,7 @@ Before running benchmarks:
 - [ ] Run preprocessing pipeline end-to-end on sample
 - [ ] Verify output columns match Product schema exactly
 
-## 12. Summary Table: Key Findings
+## 11. Summary Table: Key Findings
 
 | Aspect | Finding | Impact | Action |
 |---|---|---|---|
@@ -243,7 +241,7 @@ Before running benchmarks:
 | **ETL complexity** | Single-table >> multi-table by 2–3x | Strongly prefer Amazon 42K | Pick Amazon 42K |
 | **Delivery_time signal strength** | Olist > DataCo > Amazon 42K (synthetic) | Trade-off speed vs realism | Use Amazon 42K for speed |
 
-## 13. Sources & Links
+## 12. Sources & Links
 
 1. [Amazon Products Sales 42K (2025)](https://www.kaggle.com/datasets/ikramshah512/amazon-products-sales-dataset-42k-items-2025)
 2. [Cleaned Amazon Sales & Reviews](https://www.kaggle.com/datasets/nadaarfaoui/cleaned-amazon-sales-and-reviews-dataset)
